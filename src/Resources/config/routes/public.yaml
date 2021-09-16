@@ -1,0 +1,20 @@
+# formbuilder_preview_form:
+formbuilder_create_ticket:
+    path: /formbuilder/preview/{id}
+    controller: UVDesk\CommunityPackages\UVDesk\FormComponent\Controller\FormBuilderController::previewForm
+    defaults: {id: ''}
+
+formbuilder_preview_create_ticket:
+    path: /settings/formbuilder/update/{id}
+    controller: UVDesk\CommunityPackages\UVDesk\FormComponent\Controller\FormBuilderController::previewForm
+    defaults: {id: ''}
+
+formbuilder_previewJS_create_ticket:
+    path: /formbuilder/previewJS/{id}
+    controller: UVDesk\CommunityPackages\UVDesk\FormComponent\Controller\FormBuilderController::previewFormJS
+    defaults: {id: ''}
+
+formbuilder_previewJS_create_ticket_JS:
+    path: /settings/formbuilder/update/JS/{id}
+    controller: UVDesk\CommunityPackages\UVDesk\FormComponent\Controller\FormBuilderController::previewFormJS
+    defaults: {id: ''}

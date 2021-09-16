@@ -1,0 +1,639 @@
+var uvFormLoadAction;
+{% if notAvailable is defined and notAvailable %}
+	uvFormLoadAction = function() {
+		var topMessage = document.getElementById('uv_top_message');
+		topMessage.innerHTML = '';
+		var topMessage = document.getElementById('uv_top_message');
+		var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		// setAttributes(svg, {"width":"243", "height":"201", "viewBox": "0 0 243 201"});
+		path1 = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		setAttributes(path1, {"class":"cls-1", "d":"M180.571,122H60.613a7.472,7.472,0,0,1-6.464-11.475C56.761,105.956,109.5,14.6,114.007,6.807a7.447,7.447,0,0,1,12.995,0c3.308,5.612,56.313,97.314,60,103.955C189.7,115.624,186.715,122,180.571,122Z"});
+		svg.appendChild(path1);
+		path2 = document.createElementNS('http://www.w3.org/2000/svg',"path");
+		setAttributes(path2, {"class":"cls-2", "d":"M120,40a5,5,0,0,1,5,5V81a5,5,0,0,1-10,0V45A5,5,0,0,1,120,40Zm0,51h0a6,6,0,0,1,6,6h0a6,6,0,0,1-6,6h0a6,6,0,0,1-6-6h0A6,6,0,0,1,120,91Z"});
+		svg.appendChild(path2);
+		style = document.createElement("style");
+		css = ".cls-1{fill:#ffca28}.cls-2{fill:#fff;animation:bounce 2s infinite}@keyframes bounce{0%,100%,20%,50%,80%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}";
+		svg.appendChild(style);
+		topMessage.appendChild(svg);
+		if (style.styleSheet){
+		  style.styleSheet.cssText = css;
+		} else {
+		  style.appendChild(document.createTextNode(css));
+		}
+		var msg = document.createElement('div');
+		msg.style.textAlign = 'center';
+		msg.style.maxWidth = '300';
+		{% if msg is defined %}
+			msg.innerHTML = "{{ msg }}";
+		{% else %}
+			msg.innerHTML = "{{ 'Right Now, Form is not Available! visit %uvdesk%'|trans({'%uvdesk%': '<a href='~absolute_url(path('dashboard_action')) ~'>UVdesk</a>'})|raw }}";
+		{% endif %}
+		topMessage.appendChild(msg);
+
+		function setAttributes(el, attrs) {
+			for(var key in attrs) {
+			    el.setAttribute(key, attrs[key]);
+			  }
+		};
+		try {
+			var uvEvt = new Event("uvFormLoaded");
+			window.dispatchEvent(uvEvt);
+		} catch(e) {
+		}
+	};
+{% else %}
+	uvFormLoadAction = function(e) {
+		var topMessage = document.getElementById('uv_top_message');
+		topMessage.className = '';
+		topMessage.innerHTML = '';
+		{% for flashMessage in app.session.flashbag.get('success') %}
+			var flash = document.createElement('div');
+			flash.innerHTML = '{{ flashMessage }}';
+			flash.className = "uv_flash success";
+			{#flash.style.backgroundColor = '#37bc9b';#}
+			close = document.createElement("span");
+			close.className = 'close';
+			close.style.marginLeft = '20px';
+			close.innerHTML = 'Ã—';
+			flash.appendChild(close);
+			topMessage.appendChild(flash);
+		{% endfor %}
+		{% for flashMessage in app.session.flashbag.get('warning') %}
+			var flash = document.createElement('div');
+			flash.innerHTML = '{{ flashMessage }}';
+			flash.className = "uv_flash danger";
+			{#flash.style.backgroundColor = '#da4453';#}
+			close = document.createElement("span");
+			close.className = 'close';
+			close.style.marginLeft = '20px';
+			close.innerHTML = 'Ã—';
+			flash.appendChild(close);
+			topMessage.appendChild(flash);
+		{% endfor %}
+	    var top = document.getElementById('uv_top_message');
+
+	    //create a form
+		var f = document.createElement("form");
+		f.setAttribute('name',"{{ formbuilder.form_name }}");
+		f.setAttribute('method',"POST");
+		f.setAttribute('class',"uv_form");
+		f.setAttribute('id',"form_submit");
+		f.setAttribute('enctype',"multipart/form-data");
+		f.setAttribute('action',"{{ absolute_url(path('formbuilder_previewJS_create_ticket_JS', {'id': formbuilder.id})) }}");
+
+		var sideHead = document.createElement("h2");
+		var boldHead = document.createElement("b");
+        boldHead.innerHTML = "{{ formbuilder.form_name }}";
+        sideHead.appendChild(boldHead);
+		f.appendChild(sideHead);
+
+        {% for uf in UpdatedFields %}
+        {% if formbuilder.name == '1' and uf.fieldId is defined and uf.fieldId == '101' %}
+		var div_input_filed = document.createElement("div");
+		div_input_filed.setAttribute('class',"uv_form-group");
+		var field_label = document.createElement("label");
+		field_label.setAttribute('class',"uv_required");
+		field_label.innerHTML = "{{ uf.name |trans }}";
+		var input_field = document.createElement("input");
+		input_field.id = 'uv_' + '{{ uf.fieldId }}';
+        input_field.type = "text";
+        input_field.name = "name";
+		input_field.value = "{{ post.name is defined ? post.name : '' }}";
+		input_field.setAttribute('class',"uv_form-control");
+		input_field.setAttribute('required',"required");
+		
+		var main_div_span = document.createElement("span");
+		main_div_span.setAttribute('class',"uv-field-info");
+		main_div_span.innerHTML = "{{  uf.placeholder |trans }}";
+
+		div_input_filed.appendChild(field_label);
+		div_input_filed.appendChild(input_field);
+		div_input_filed.appendChild(main_div_span);
+		f.appendChild(div_input_filed);
+
+        
+		{% endif %}
+
+        {% if formbuilder.email == '1' and uf.fieldId is defined and uf.fieldId == '102' %}
+		var div_input_filed = document.createElement("div");
+		div_input_filed.setAttribute('class',"uv_form-group");
+		var field_label = document.createElement("label");
+		field_label.setAttribute('class',"uv_required");
+		field_label.innerHTML = "{{ uf.name |trans }}";
+		var input_field = document.createElement("input");
+        input_field.type = "text";
+        input_field.name = "email";
+		input_field.id = 'uv_' + '{{ uf.fieldId }}';
+		input_field.value = "{{ post.name is defined ? post.name : '' }}";
+		input_field.setAttribute('class',"uv_form-control");
+		input_field.setAttribute('required',"required");
+
+		var child_div_span = document.createElement("span");
+		child_div_span.setAttribute('class',"uv-field-info email");
+		
+		var main_div_span = document.createElement("span");
+		main_div_span.setAttribute('class',"uv-field-info");
+		main_div_span.innerHTML = "{{  uf.placeholder |trans }}";
+
+
+		div_input_filed.appendChild(field_label);
+		div_input_filed.appendChild(input_field);
+		div_input_filed.appendChild(child_div_span);
+		div_input_filed.appendChild(main_div_span);
+		f.appendChild(div_input_filed);
+
+		{% endif %}
+
+        {% if formbuilder.subject == '1' and uf.fieldId is defined and uf.fieldId == '103' %}
+		var div_input_filed = document.createElement("div");
+		div_input_filed.setAttribute('class',"uv_form-group");
+		var field_label = document.createElement("label");
+		field_label.setAttribute('class',"uv_required");
+		field_label.innerHTML = "{{ uf.name |trans }}";
+		var input_field = document.createElement("input");
+        input_field.type = "text";
+        input_field.name = "subject";
+		input_field.id = 'uv_' + '{{ uf.fieldId }}';
+		input_field.value = "{{ post.name is defined ? post.name : '' }}";
+		input_field.setAttribute('class',"uv_form-control");
+		input_field.setAttribute('required',"required");
+		
+		var main_div_span = document.createElement("span");
+		main_div_span.setAttribute('class',"uv-field-info");
+		main_div_span.innerHTML = "{{  uf.placeholder |trans }}";
+
+		div_input_filed.appendChild(field_label);
+		div_input_filed.appendChild(input_field);
+		div_input_filed.appendChild(main_div_span);
+		f.appendChild(div_input_filed);
+
+		{% endif %}
+
+		{% if formbuilder.type == '1' and uf.fieldId is defined and uf.fieldId == '104' %}
+		var div_input_filed = document.createElement("div");
+		div_input_filed.setAttribute('class',"uv_form-group");
+		var field_label = document.createElement("label");
+		field_label.setAttribute('class',"uv_required");
+		field_label.innerHTML = "{{ uf.name |trans }}";
+
+        var select_input = document.createElement("select");
+		select_input.setAttribute('class',"uv_selectpicker");
+		select_input.setAttribute('name',"type");
+		select_input.setAttribute('id','uv_' + '{{ uf.fieldId }}');
+		select_input.type = "type";
+
+        var select_input_option = document.createElement("option");
+		select_input_option.setAttribute('value'," ");
+		select_input_option.innerHTML = "Choose query Type";
+		select_input.appendChild(select_input_option);
+
+		{% for type in ticket_service.getTypes() %}
+		    var select_input_option = document.createElement("option");
+		    select_input_option.setAttribute('value',"{{ type.id }}");
+		    select_input_option.innerHTML = "{{ type.name }}";
+			select_input.appendChild(select_input_option);
+			
+		{% endfor %}
+
+		var main_div_span = document.createElement("span");
+		main_div_span.setAttribute('class',"uv-field-info");
+		main_div_span.innerHTML = "{{  uf.placeholder |trans }}";
+
+		div_input_filed.appendChild(field_label);
+		div_input_filed.appendChild(select_input);
+		div_input_filed.appendChild(main_div_span);
+		f.appendChild(div_input_filed);
+
+		{% endif %}
+
+		{% if formbuilder.reply == '1' and uf.fieldId is defined and uf.fieldId == '105' %}
+		var div_input_filed = document.createElement("div");
+		div_input_filed.setAttribute('class',"uv_form-group");
+		var field_label = document.createElement("label");
+		field_label.setAttribute('class',"uv_required");
+		field_label.innerHTML = "{{ uf.name |trans }}";
+		var input_field = document.createElement("textarea");
+        input_field.type = "reply";
+        input_field.name = "reply";
+		input_field.id = 'uv_' + '{{ uf.fieldId }}';
+		input_field.value = "{{ post.name is defined ? post.name : '' }}";
+		input_field.setAttribute('class',"uv_form-control");
+		input_field.setAttribute('required',"required");
+		
+		var main_div_span = document.createElement("span");
+		main_div_span.setAttribute('class',"uv-field-info");
+		main_div_span.innerHTML = "{{  uf.placeholder |trans }}";
+
+		div_input_filed.appendChild(field_label);
+		div_input_filed.appendChild(input_field);
+		div_input_filed.appendChild(main_div_span);
+		f.appendChild(div_input_filed);
+
+		{% endif %}
+
+		{% if formbuilder.order_no == '1' and uf.fieldId is defined and uf.fieldId == '106' %}
+		var div_input_filed = document.createElement("div");
+		div_input_filed.setAttribute('class',"uv_form-group");
+		var field_label = document.createElement("label");
+		field_label.setAttribute('class',"uv_required");
+		field_label.innerHTML = "{{ uf.name |trans }}";
+		var input_field = document.createElement("input");
+        input_field.type = "reply";
+        input_field.name = "order_no";
+		input_field.id = 'uv_' + '{{ uf.fieldId }}';
+		input_field.value = "{{ post.name is defined ? post.name : '' }}";
+		input_field.setAttribute('class',"uv_form-control");
+		input_field.setAttribute('required',"required");
+		
+		var main_div_span = document.createElement("span");
+		main_div_span.setAttribute('class',"uv-field-info");
+		main_div_span.innerHTML = "{{  uf.placeholder |trans }}";
+
+		div_input_filed.appendChild(field_label);
+		div_input_filed.appendChild(input_field);
+		div_input_filed.appendChild(main_div_span);
+		f.appendChild(div_input_filed);
+
+		{% endif %}
+
+		{% if formbuilder.file == '1' and uf.fieldId is defined and uf.fieldId == '107' %}
+		var div_input_filed = document.createElement("div");
+		div_input_filed.setAttribute('class',"uv_form-group");
+		var field_label = document.createElement("label");
+		field_label.setAttribute('class',"uv_required");
+		field_label.innerHTML = "{{ uf.name |trans }}";
+		var input_field = document.createElement("input");
+		input_field.type = 'uv_' + '{{uf.fieldId}}';
+        input_field.type = "file";
+        input_field.name = "file";
+		input_field.value = "{{ post.name is defined ? post.name : '' }}";
+		input_field.setAttribute('required',"required");
+		input_field.setAttribute('class',"uv_form-control");
+		
+
+		div_input_filed.appendChild(field_label);
+		div_input_filed.appendChild(input_field);
+		f.appendChild(div_input_filed);
+
+		{% endif %}
+        {% endfor %}
+
+		{% if customFields is not empty and customFields is defined %}
+            {% for cf in customFields %}
+                {% if cf is not empty  %}
+				    {% if (cf.agentType == 'apps') or (cf.agentType == 'both')  %}
+						{% if cf.fieldType is defined and cf.fieldType == 'text' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}"  );
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							var field_label = document.createElement("label");
+							field_label.setAttribute('class',"uv_required ");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+							var input_field = document.createElement("input");
+        					input_field.type = "text";
+							input_field.id   ="{{ cf.id }}";
+        					input_field.name = "customFields[ {{  cf.id }} ]";
+							input_field.value = "{{ post.name is defined ? post.name : '' }}";
+							input_field.setAttribute('class',"uv_form-control");
+							{% if cf.required  %}
+							input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+							{% endif %}
+		
+							div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(input_field);
+							f.appendChild(div_input_filed);
+
+						{% endif %}
+
+						{%  if cf.fieldType is defined and cf.fieldType == 'textarea' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group");
+							var field_label = document.createElement("label");
+							div_input_filed.setAttribute('class',"uv_required {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+							var input_field = document.createElement("textarea");
+        					input_field.type = "textarea";
+							input_field.id   ="{{ cf.id }}";
+        					input_field.name = "customFields[ {{  cf.id }}]";
+							input_field.value = "{{ post.name is defined ? post.name : '' }}";
+							input_field.setAttribute('class',"uv_form-control");
+							{% if cf.required  %}
+							input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+							{% endif %}
+		
+							div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(input_field);
+							f.appendChild(div_input_filed);
+
+						{% endif %}
+
+                        {%  if cf.fieldType is defined and cf.fieldType == 'radio' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group");
+							var field_label = document.createElement("label");
+							div_input_filed.setAttribute('class',"uv_required {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+
+							var radio_span = document.createElement("span");
+        					radio_span.setAttribute('class',"optionwrapper");
+
+							{% for options in cf.options %}
+                                var input_field = document.createElement("input");
+        					    input_field.type = "radio";
+								input_field.name = "customFields[{{  cf.id }}]";
+								input_field.value = "{{ options.id }}";
+								{% if cf.required  %}
+								input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+								{% endif %}
+
+								var input_field_label = document.createElement("label");
+								input_field_label.setAttribute('for',"{{options.id}}"); 
+								input_field_label.innerHTML = "{{ options.name }}";
+								
+								radio_span.appendChild(input_field);
+								radio_span.appendChild(input_field_label);
+							{% endfor %}
+
+                            div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(radio_span);
+							f.appendChild(div_input_filed);
+   
+
+						{% endif %}
+
+                        {%  if cf.fieldType is defined and cf.fieldType == 'select' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							var field_label = document.createElement("label");
+							field_label.setAttribute('class',"uv_required");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+
+							var input_select = document.createElement("select");
+        					input_select.setAttribute('class',"uv_form-control");
+							input_select.name = "customFields[{{  cf.id }}]";
+							input_select.value = "{{ cf.id }}";
+							input_select.id = "for{{cf.name~cf.id}}";
+							{% if cf.required  %}
+							input_select.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+							{% endif %}
+
+							var select_input_option = document.createElement("option");
+		                    select_input_option.innerHTML = "Default";
+			                input_select.appendChild(select_input_option);
+
+
+                            {% for option in cf.options %}
+		                    var select_input_option = document.createElement("option");
+		                    select_input_option.setAttribute('value',"{{option.id}}");
+		                    select_input_option.innerHTML = "{{ option.name }}";
+			                input_select.appendChild(select_input_option);
+			
+		                    {% endfor %}
+
+
+
+                            div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(input_select);
+							f.appendChild(div_input_filed);
+   
+
+						{% endif %}
+
+                        {%  if cf.fieldType is defined and cf.fieldType == 'checkbox' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group");
+							var field_label = document.createElement("label");
+							div_input_filed.setAttribute('class',"uv_required {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+
+							var radio_span = document.createElement("span");
+        					radio_span.setAttribute('class',"optionwrapper");
+							radio_span.id = "uv_Checkbox";
+
+							{% for options in cf.options %}
+                                var input_field = document.createElement("input");
+        					    input_field.type = "checkbox";
+								input_field.name = "customFields[{{  cf.id }}]";
+								input_field.value = "{{ options.id }}";
+								input_field.id = "{{ cf.id }}";
+								input_field.setAttribute('class',"input-checkbox checkboxes");
+								input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+
+								var input_field_label = document.createElement("label");
+								input_field_label.setAttribute('for',"{{options.id}}"); 
+								input_field_label.innerHTML = "{{ options.name }}";
+								
+								radio_span.appendChild(input_field);
+								radio_span.appendChild(input_field_label);
+							{% endfor %}
+
+                            div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(radio_span);
+							f.appendChild(div_input_filed);
+   
+
+						{% endif %}
+
+                        {%  if cf.fieldType is defined and cf.fieldType == 'date' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group");
+							var field_label = document.createElement("label");
+							div_input_filed.setAttribute('class',"uv_required {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+							var input_field = document.createElement("input");
+        					input_field.type = "date";
+							input_field.id   ="{{ cf.id }}";
+        					input_field.name = "customFields[{{  cf.id }}]";
+							input_field.value = "";
+							input_field.setAttribute('class',"uv_form-control");
+							{% if cf.required  %}
+							input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+							{% endif %}
+		
+							div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(input_field);
+							f.appendChild(div_input_filed);
+
+						{% endif %}
+
+
+						{%  if cf.fieldType is defined and cf.fieldType == 'time' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group");
+							var field_label = document.createElement("label");
+							div_input_filed.setAttribute('class',"uv_required {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+							var input_field = document.createElement("input");
+        					input_field.type = "time";
+							input_field.id   ="{{ cf.id }}";
+        					input_field.name = "customFields[{{  cf.id }}]";
+							input_field.value = "";
+							input_field.setAttribute('class',"uv_form-control");
+							{% if cf.required  %}
+							input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+							{% endif %}
+
+		
+							div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(input_field);
+							f.appendChild(div_input_filed);
+
+						{% endif %}
+
+						{%  if cf.fieldType is defined and cf.fieldType == 'datetime' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group");
+							var field_label = document.createElement("label");
+							div_input_filed.setAttribute('class',"uv_required {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+							var input_field = document.createElement("input");
+        					input_field.type = "datetime-local";
+							input_field.id   ="{{ cf.id }}";
+        					input_field.name = "customFields[{{  cf.id }}]";
+							input_field.value = "";
+							input_field.setAttribute('class',"uv_form-control");
+							{% if cf.required  %}
+							input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+							{% endif %}
+		
+							div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(input_field);
+							f.appendChild(div_input_filed);
+
+						{% endif %}
+
+						{%  if cf.fieldType is defined and cf.fieldType == 'file' %}
+							var div_input_filed = document.createElement("div");
+							div_input_filed.setAttribute('class',"uv_form-group {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}");
+							div_input_filed.setAttribute('style',"position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}");
+							var field_label = document.createElement("label");
+							field_label.setAttribute('class',"uv_required");
+							field_label.innerHTML = "{{ cf.name |trans }}";
+							var input_field = document.createElement("input");
+        					input_field.type = "file";
+							input_field.id   ="{{ cf.id }}";
+        					input_field.name = "customFields[{{  cf.id }}]";
+							input_field.value = "";
+							input_field.setAttribute('class',"uv_form-control");
+							{% if cf.required  %}
+							input_field.setAttribute('required',"{{ cf.required ? "required" : "" }}");
+							{% endif %}
+		
+							div_input_filed.appendChild(field_label);
+							div_input_filed.appendChild(input_field);
+							f.appendChild(div_input_filed);
+
+						{% endif %}
+
+
+
+
+					{% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+
+
+		var submit_button = document.createElement("button");
+        submit_button.type = "submit";
+		submit_button.id   ="uv_submit";
+		submit_button.value   = "Create Ticket";
+        submit_button.name = "submit";
+		submit_button.setAttribute('class',"btn btn-md btn-info");
+        submit_button.innerHTML = "Create Ticket";
+		
+		f.appendChild(submit_button);
+
+
+top.appendChild(f); //pure javascript
+
+if(document.getElementById('uv_104')) {
+	document.getElementById('uv_104').addEventListener('change', function(event) {
+		selectedVal = event.currentTarget.value;
+		if((allDependent = document.getElementsByClassName('dependent')) && (len = allDependent.length)) {
+			for(i=0;i<len;i++) {
+				allDependent[i].style.display = 'none';
+				}
+			}
+		if((dependent = document.getElementsByClassName('dependency'+selectedVal)) && (leng = dependent.length)) {
+			for(j=0;j<leng;j++) {
+				dependent[j].style.display = 'block';
+			    }
+			}
+	});
+}
+
+var checkboxes = $('.input-checkbox');
+checkboxes.change(function(){
+    if($('.checkboxes:checked').length > 0) {
+        checkboxes.removeAttr('required');
+    }
+});
+
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
+
+function validate() {
+  const $result = $(".email");
+  const email = $('#uv_102').val();
+  $result.text("");
+
+  if (validateEmail(email)) {
+    $result.text(""); 
+	$("#uv_102").closest("div").removeClass('uv_has_error') ;
+	return true;
+  } else {
+	if(email != ""){
+    		$result.text(email + " is not valid");
+    		$result.css("color", "red");
+		$("#uv_102").closest("div").addClass('uv_has_error') ;
+	}else{
+		$result.text( "email field must not be empty !!! ");
+    		$result.css("color", "red");
+		$("#uv_102").closest("div").addClass('uv_has_error') ;
+	}
+  }
+  return false;
+}
+
+$("#uv_submit").on("click", validate);
+
+function checkhidden() {
+
+    {% if formbuilder.type == '0' %}
+    	{% for cf in customFields %}
+    		{% if cf is not empty  %}
+	        	{% if (cf.agentType == 'apps') or (cf.agentType == 'both')  %}
+				{% if cf.customFieldsDependency|length > 0  %}
+			 		document.getElementById("{{ cf.id }}").removeAttribute("required");
+				{% endif %}
+			{% endif %}
+        	{% endif %}
+    	{% endfor %}
+   {% endif %}
+ 
+  return true;
+}
+
+$("#uv_submit").on("click", checkhidden);
+
+
+};
+
+{% endif %}
+window.addEventListener('load', function() {
+	if(typeof(uvFormLoadAction) === 'function') {
+		uvFormLoadAction();
+	}
+});

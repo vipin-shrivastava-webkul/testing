@@ -1,0 +1,596 @@
+{% extends "@UVDeskCoreFramework/Templates/layout.html.twig" %}
+   {% block javascripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.12.0/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"></script>
+    {% endblock %}
+{% block pageContent %}
+
+{% block title %}Form Builder Settings{% endblock %}
+
+{% block templateCSS %}
+    <style>
+		.uv-action-bar {
+			border-bottom: 1px solid #d3d3d3;
+			padding-bottom: 10px;
+		}
+		.mailer-id {
+			font-weight: 600;
+			border: 1px solid #333;
+			background: #cecece;
+			padding: 2px 4px 2px;
+			border-radius: 2px;
+		}
+		.uv-app-list-brick {
+			width: 310px;
+			max-width: 100%;
+			font-size: 0;
+			margin: 15px 20px 0px 0px;
+			display: inline-block;
+			border-radius: 3px;
+			border: solid 1px #7C70F4;
+		}
+		.uv-app-list-brick .uv-app-list-brick-lt {
+			display: inline-block;
+			vertical-align: middle;
+			width: 35%;
+			height: 100%;
+			text-align: center;
+			background-color: #7C70F4;
+		}
+		.uv-app-list-brick .uv-app-list-brick-lt span {
+			font-size: 24px;
+			color: #FFFFFF;
+			padding: 24px 0px;
+			display: inline-block;
+			line-height: 40px;
+		}
+		.uv-app-list-brick .uv-app-list-brick-rt {
+			width: 65%;
+			padding: 10px 15px 9px 15px;
+			display: inline-block;
+			vertical-align: middle;
+		}
+		.uv-app-list-brick .uv-app-list-brick-rt p {
+			width: 100%;
+			margin: 0px;
+			margin-bottom: 3px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		.uv-app-list-brick .uv-app-list-brick-rt span.uv-app-list-flag-active {
+			font-size: 15px;
+			color: #FFFFFF;
+			background-color: #2ED04C;
+			display: inline-block;
+			padding: 0px 7px 1px 7px;
+			margin-bottom: 2px;
+			border-radius: 3px;
+		}
+		.uv-app-list-brick .uv-app-list-brick-rt span.uv-app-list-flag-inactive {
+			font-size: 15px;
+			color: #FFFFFF;
+			background-color: #FF5656;
+			display: inline-block;
+			padding: 0px 7px 1px 7px;
+			margin-bottom: 2px;
+			border-radius: 3px;
+		}
+		.uv-app-list-brick .uv-app-list-brick-rt a:link,
+		.uv-app-list-brick .uv-app-list-brick-rt a:focus,
+		.uv-app-list-brick .uv-app-list-brick-rt a:hover,
+		.uv-app-list-brick .uv-app-list-brick-rt a:active,
+		.uv-app-list-brick .uv-app-list-brick-rt a:visited {
+			font-size: 15px;
+			color: #2750C4;
+			margin-right: 10px;
+			display: inline-block;
+		}
+		.uv-app-list-brick .uv-app-list-brick-rt a.uv-delete {
+			color: #FF5656;
+		}
+		.mailbox-del-button {
+		    padding: 8px 10px;
+    		border-radius: 3px;
+			cursor: pointer;
+			/* vertical-align: middle; */
+			font-size: 15px;
+			display: inline-block;
+			margin: 5px 0px;
+			color: #e00d0d;
+		}
+	</style>
+
+
+   <style>
+    .hide {
+        display: none;
+    }
+    .controls ul {
+        list-style: none;
+        padding: 0px;
+        margin: 0;
+        color: #434A54;
+    }
+    .controls ul li[draggable] {
+        display: block;
+        border: 1px dashed gray;
+        box-sizing:border-box;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border-radius: 2px;
+        cursor:pointer;
+    }
+    .controls ul li:hover {
+        background-color: #e9f1ff;
+    }
+    .td-input {
+        width: 80%;
+    }
+    .td-input ,.td-button {
+        border: 1px solid #ddd !important;
+    }
+    .td-button {
+        width: 10%;
+        text-align: center;
+    }
+    .td-button span {
+        cursor: pointer;
+    }
+    input[type=checkbox] {
+        width: 16px;
+        height: 16px;
+        vertical-align: top;
+    }
+    .validation, .encryption {
+        display:none;
+        margin-bottom: 10px;
+    }
+    .tab {
+        background-color: inherit;
+        border:none;
+    }
+    .uv-checkbox input{
+        cursor: pointer;
+        margin: 0;
+    }
+    #field_save {
+        margin-bottom: 20px;
+    }
+    .tab,.selected {
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+    }
+    .tab:hover {
+        border-bottom: solid 3px #7C70F4;
+    }
+    .selected {
+        position: relative;
+        border-bottom: solid 3px #7C70F4;
+        background-color:#fff;
+    }
+    #choices {
+        display: none;
+    }
+    li.list-group-item {
+        background-color: #fafafa;
+        border-bottom:1px solid #D3D3D3;
+        position: relative;
+        user-select: none;
+    }
+    .list-group-item>span:first-child {
+        display: inline-block;
+        vertical-align: top;
+        width: 30px;
+    }
+    .list-group-item>span:first-child span {
+        position: absolute;
+        top: 56px;
+        left: 15px;
+    }
+    .list-group-item>div {
+        display: inline-block;
+        width: calc(100% - 50px);
+        padding: 15px 10px 15px 0;
+    }
+    .list-group-item label,.validation label,label.full-label {
+        display: block;
+    }
+    .list-group-item input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),.list-group-item textarea {
+        background-color: #fff !important;
+        cursor: default;
+    }
+    .list-group-item input[type=file]{
+        cursor: default;
+        padding: 0px 4px;
+        -webkit-padding-before: 4px;
+    }
+    .list-group-item textarea {
+        resize: none;
+    }
+    #mandatory-field-table {
+        border-collapse: collapse;
+    }
+    .controls h2:first-child {
+        color: #9d9d9d;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .dependency {
+        max-height: 150px;
+        overflow: auto;
+    }
+    .info {
+        font-size: 16px;
+        color: #6F6F6F;
+    }
+    [draggable] {
+    -webkit-user-drag: element;
+    -khtml-user-drag: element;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    }
+    ::placeholder,::-webkit-input-placeholder ,:-moz-placeholder,::-moz-placeholder,:-ms-input-placeholder {
+        font-size: 14px;
+    }
+    .uv-mar-10 {
+        margin: 10px;
+    }
+    .badge-processing {
+        cursor: not-allowed;
+        opacity: 0.65;
+    }
+    .badge-processing>i:before {
+        content: "\f110";
+    }
+    .dashed {
+        border: 1px dashed #999999 !important;
+    }
+    .rel {
+        position: relative;
+    }
+    span.disabledWrapper {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 999;
+    }
+    .badge-status-disabled,.badge-status-disabled:hover {
+        cursor: not-allowed!important;
+    }
+    .controls {
+        width: 250px;
+        border: 1px solid #D3D3D3;
+        padding: 15px;
+        border-radius: 4px;
+        margin-right: 20px;
+        vertical-align: top;
+        display: inline-block;
+    }
+    .mandatory-field-list-wrapper {
+        display: inline-block;
+        width: 60%;
+        margin-top: 10px;
+    }
+    .mandatory-field-list-wrapper > .uv-message-wrapper{
+        margin: 0 0 25px 0px;
+    }
+    .mandatory-field-list {
+        border: 1px solid #D3D3D3;
+        border-radius: 4px;
+        padding: 8px;
+        vertical-align: top;
+        position: relative;
+    }
+    .list-group {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        border: 1px solid #D3D3D3;
+        border-bottom: none;
+    }
+    .mar-bottom-15 {
+        margin-bottom: 15px !important;
+    }
+    .add-edit-form label {
+        display: block;
+    }
+    .titlebar {
+        border-bottom: 1px solid #D3D3D3;
+        margin-left: 10px;
+        margin-right: -10px;
+    }
+    .titlebar button:active,.titlebar button:focus {
+        outline: none;
+    }
+    .titlebar button {
+        font-size: 15px;
+    }
+    #field-form {
+        border-bottom: 1px solid #d3d3d3;
+    }
+    form[name="field"] {
+        padding-left: 20px;
+    }
+    .field-form {
+        margin: 10px;
+        border-collapse: collapse;
+        user-select: none;
+    }
+    .cf-actions {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+    }
+    .table-bordered {
+        width: 100%;
+        border: 1px solid #D3D3D3;
+        border-collapse: collapse;
+        margin: 15px 0px;
+    }
+    .table-bordered th {
+        padding: 10px;
+    }
+    .cf-actions span {
+        cursor: pointer;
+        margin-right: 15px;
+        margin-top: 15px;
+    }
+    .mandatory-field-list .uv-select[disabled="disabled"],.mandatory-field-list .uv-field[disabled="disabled"] {
+        background-color: #fff !important;
+    }
+    .uv-add-margin {
+        margin: 15px 0px;
+    }
+    li+.no-result-msg {
+        display: none;
+    }
+    .no-result-msg {
+        border-bottom: 1px solid #dedede;
+        padding-bottom: 10px;
+        margin-bottom: 0px !important;
+    }
+    .last-tr {
+        border: 1px solid #d3d3d3;
+    }
+    .last-tr .uv-cf-add {
+        vartical-align: top;
+    }
+    .note-btn {
+        margin-left: 5px;
+    }
+    .mandatory-field-list .uv-loader {
+        margin-left: 40%;
+    }
+    @media screen and (max-width: 500px) {
+        .mandatory-field-list-wrapper {
+            width: 250px;
+            margin-top: 10px;
+        }
+    }
+    .mandatory-field-list .uv-element-block {
+        width: 100%;
+    }
+    .uv-xtra-info {
+        font-weight: bold;
+        margin-left: 5px;
+        font-style: normal;
+        cursor: help;
+    }
+    li#view-li {
+        border-bottom: 1px solid #d3d3d3;
+    }
+</style>
+
+{% endblock %}
+
+
+<div class="uv-inner-section" id='form-setting-option'>
+
+        {# Append Panel Aside #}
+		{% set asideTemplate = 'Webkul\\UVDesk\\CoreFrameworkBundle\\Dashboard\\AsideTemplate' %} 
+		{% set asideSidebarReference = 'Webkul\\UVDesk\\ExtensionFrameworkBundle\\UIComponents\\Dashboard\\Homepage\\Sections\\Apps' %} 
+		{{ uvdesk_extensibles.getRegisteredComponent(asideTemplate).renderSidebar(asideSidebarReference) | raw }}
+ 
+    <script type = "text/javascript">
+        function getDefaultPlaceholder(name) {
+            switch (name) {
+                case 'name':
+                    result = "Customer full name";
+                    break;
+                case 'email':
+                    result = "Customer email address";
+                    break;
+                case 'type':
+                    result = "Customer type";
+                    break;
+                case 'subject':
+                    result = "Ticket subject";
+                    break;
+                case 'reply':
+                    result = "Customer query message";
+                    break;
+                case 'GDPR':
+                    result = "I agree to the Terms & Conditions";
+                    break;
+                case 'file':
+                    result = "Attachments"
+                    break;
+                default:
+                    result = name;
+                    break;
+            }
+            return result;
+        };
+
+        $(document).ready(function() {
+            $('#field-form').hide();
+            var self = this;
+            $('.uv-cf-edit').click(function(e) {
+                let currentField = e.target.closest("li");
+                let id = (currentField.nextElementSibling) ? currentField.nextElementSibling.id : '';
+                if (id == "view-li") {
+                    $('#view-li').remove();
+                } else if (!$('#view-li').is(':visible') || id != "view-li") {
+                    // info of field for editor is going to open
+                    let fieldName = document.getElementsByName('fieldName');
+                    // if do not exist then create new one
+                    if (fieldName.length) {
+                        fieldName[0].setAttribute('value', currentField.id);
+                    } else {
+                        var updatedForm = "";
+                        let fullFormArea = $('#field-form');
+                        // copy of a form
+                        updatedFullForm = fullFormArea.clone();
+                        updatedForm = updatedFullForm.find('form');
+                        console.log(updatedForm[0]);
+                        // update details of copied form
+                        updatedForm[0].setAttribute('id', currentField.id + '-form');
+                        updatedForm.find('#field_name')[0].setAttribute('name', currentField.id + '-name');
+                        updatedForm.find('#field_name')[0].setAttribute('id', currentField.id + '-name');
+                        updatedForm.find('#form_list_id')[0].setAttribute('value', currentField.value);
+                        updatedForm.find('#form_list_name')[0].setAttribute('value', currentField.id);
+                        
+                        updatedForm.find('#field_value')[0].setAttribute('name', currentField.id + '-placeholder');
+                        updatedForm.find('#field_value')[0].setAttribute('id', currentField.id + '-placeholder');
+                        updatedForm.find('#form_hash')[0].setAttribute('value', {{formbuilder.id}});
+                        
+                        let alredayWrote = 0;
+                        if (!alredayWrote) {
+                            var packages = {{ updatedformfields | json_encode | raw}};
+                            
+                            var jsonString = JSON.stringify(packages);
+                            var parsedJsonArray = JSON.parse(jsonString);
+                            parsedJsonArray.forEach(function(field) {
+                            if(field['fieldId'] == currentField.value){
+                            updatedForm.find('#' + currentField.id + '-name')[0].setAttribute('value',field['name']);
+                            updatedForm.find('#' + currentField.id + '-placeholder')[0].setAttribute('value',field['placeholder']);
+                            }
+                            });
+                        }
+                    }
+                    // insert editor afer targeted field
+                    let innerContent = updatedFullForm[0].innerHTML;
+                    let editableField = document.createElement("li");
+                    editableField.innerHTML = innerContent;
+                    editableField.id = "view-li";
+                    currentField.parentNode.insertBefore(editableField, currentField.nextSibling);
+                }
+            });
+        });
+    </script>
+
+		<div class="uv-view {% if app.request.cookies and app.request.cookies.get('uv-asideView') %}uv-aside-view{% endif %}">
+			<div class="uv-action-bar">
+                <div class="uv-action-bar-col-lt" style="vertical-align: middle;">
+					<h1>{{ 'Update Form Fields'|trans }}</h1>
+                </div>
+            </div>
+
+        <div class="uv-mandatory-field">
+            <div class="mandatory-field-list-wrapper">
+                <div id="mandatory-fields" class="mandatory-field-list">
+                    <ul class="list-group list-lg ui-sortable">
+                        <li class="list-group-item editing" id="email" value="102">
+                            <span>
+                            </span>
+                            <span class="cf-actions">
+                                <span  class="uv-cf-edit" name="email"></span>
+                            </span>
+                            <div id=email-field-container>
+                                <label>Email</label>
+                                <span class="rel">
+                                    <span class="uv-field-info">Customer email address</span>
+                                    <span class="disabledWrapper for-Text"></span>
+                                </span>
+                            </div>
+                        </li>
+                        <li class="list-group-item editing" id="reply" value="105">
+                            <span>
+                            </span>
+                            <span class="cf-actions">
+                                <span class="uv-cf-edit" name="reply"></span>
+                            </span>
+                            <div id="reply-field-container">
+                                <label>Reply</label>
+                                <span class="rel">
+                                    <span class="uv-field-info">Customer query message</span>
+                                    <span class="disabledWrapper for-Text"></span>
+                                </span>
+                            </div>
+                        </li>
+                        {% for cf in formbuilder %}
+                            {%  if cf is iterable and cf.status == '1' %}
+                                <li class="list-group-item editing" id={{cf.fieldType}} value={{cf.id}}>
+                                <span >
+                                </span>
+                                <span class="cf-actions">
+                                <span  class="uv-cf-edit" name={{cf.fieldType}}></span>
+                                </span>
+                                <div id={{cf.fieldType}}-field-container>
+                                <label>{{cf.name}}</label>
+                                <span class="rel">
+                                        <span class="uv-field-info"><script> document.write( getDefaultPlaceholder('{{cf.fieldType}}') )</script></span>
+                                <span class="disabledWrapper for-Text"></span>
+                                </span>
+                            </div>
+                            </li>
+                           {% endif %}
+                        {% endfor %}
+                        {% for cf in customFields %}
+                            {%  if cf is not empty and cf.checked == true %}
+                                <li class="list-group-item editing" id={{cf.fieldType}} value={{cf.id}}>
+                                <span >
+                                </span>
+                                <span class="cf-actions">
+                                <span  class="uv-cf-edit" name={{cf.fieldType}}></span>
+                                </span>
+                                <div id={{cf.fieldType}}-field-container>
+                                <label>{{cf.name}}</label>
+                                <span class="rel">
+                                        <span class="uv-field-info"><script type="text/javascript"> document.write( getDefaultPlaceholder('{{cf.fieldType}}') )</script></span>
+                                <span class="disabledWrapper for-Text"></span>
+                                </span>
+                            </div>
+                            </li>
+                           {% endif %}
+                        {% endfor %}
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="field-form">
+            <div class="field-form">
+                <form name="field" id="update-details-form" method="POST" action="{{ path('formbuilder_save_field_detail') }}">
+                    <div class="property tab-view">
+                        <input type="text" id="form_hash" name="hash" class="uv-field" style="display: none">
+                        <input type="text" id="form_list_id" name="list_id" class="uv-field" style="display: none">
+                        <input type="text" id="form_list_name" name="list_name" class="uv-field" style="display: none">
+                        <div class="uv-element-block required ">
+                            <label for="field_name" class="required full-label">Label</label>
+                            <input type="text" id="field_name" name="name" required="required" class="uv-field">
+                        </div>
+                        <div class="uv-element-block">
+                            <label for="field_value" class="required">Placeholder</label>
+                            <br>
+                            <input type="text" name="placeholder" class="uv-field" id="field_value" value="" required="required">
+                        </div>
+                    </div>
+                    <div class="uv-action-buttons">
+                        <button type="submit" id="field_save" class="uv-btn" >Update Fields</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+   </div>
+</div>
+
+{% endblock %} 

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Scripts -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.12.0/underscore-min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"></script>
+    </head>
+
+    <body>
+        <div class="uv-notifications-wrapper">
+            <noscript>
+                <div class="uv-notification page-load uv-error">
+                    <p>{% trans %}Your browser does not support JavaScript or You disabled JavaScript, Please enable those !{% endtrans %}</p>
+                </div>
+                <style>.uv-loader-view {display: none;}</style>
+            </noscript>
+
+            {% if uvdesk_service.requestHeadersSent() == false %}
+                {% for flashMessage in app.session.flashbag.get('success') %}
+                    <div class="uv-notification page-load uv-success">
+                        <span class="uv-notification-close"></span>
+                        <p>{{ flashMessage|raw }}</p>
+                    </div>
+                {% endfor %}
+                
+                {% for flashMessage in app.session.flashbag.get('warning') %}
+                    <div class="uv-notification page-load uv-error">
+                        <span class="uv-notification-close"></span>
+                        <p>{{ flashMessage|raw }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+    </body>
+</html>
+{#====================================================================================================#}
+
+
+{% block pageContent %}
+    <link href="{{ asset('bundles/uvdeskcoreframework/css/_uikit.css') }}" type="text/css" rel="stylesheet" media="all" />
+    <style>
+        #ticket-form {
+            margin-left: 60px; 
+            margin-top: 30px; 
+        }
+        .validation-message {
+            color: red;
+        }
+        .textarea {
+            margin-top: 30px;
+        }
+        #create-ticket-btn {
+            margin-top: 10px; 
+            display: inline-block;
+            z-index: 999; 
+        }
+        .form-builder-checkbox {
+            padding: 20px; 
+        }
+    </style>
+
+
+    {% if formbuilder is not empty and formbuilder.id is defined %}
+
+         <form method="POST" enctype="multipart/form-data" id="ticket-form">
+
+            <h2><b>{{ formbuilder.form_name }}</b></h2>
+
+            {% for uf in UpdatedFields %}
+
+                {% if formbuilder.name == '1' and uf.fieldId is defined and uf.fieldId == '101' %}
+                <div class="uv-element-block">
+                     <label class="uv-field-label">{{ uf.name |trans }}</label>
+                         <div class="uv-field-block">
+                            <input name="name" class="uv-field create-ticket name-input" type="text" value="{{ post.name is defined ? post.name : '' }}"  required>
+                            <span class="validation-message"></span>
+                         </div>
+                     <span class="uv-field-info">{{  uf.placeholder |trans }}</span>
+                </div>
+                {% endif %}
+
+                {% if formbuilder.email == '1' and uf.fieldId is defined and uf.fieldId == '102' %}
+                {# Email is a mandatory field. #}
+                <div class="uv-element-block">
+                    <label class="uv-field-label">{{ uf.name |trans }}</label>
+                        <div class="uv-field-block">
+                            <input name="email" class="uv-field create-ticket" type="text" value="" required> 
+                            <span class="validation-message"></span>
+                        </div>
+                    <span class="uv-field-info">{{  uf.placeholder |trans }}</span>
+                </div>
+                {% endif %}
+
+                {% if formbuilder.subject == '1' and uf.fieldId is defined and uf.fieldId == '103' %}
+                <div class="uv-element-block">
+                    <label class="uv-field-label">{{ uf.name |trans }}</label>
+                        <div class="uv-field-block">
+                            <input name="subject" class="uv-field create-ticket" type="text" value=""  required>
+                            <span class="validation-message"></span>
+                        </div>
+                    <span class="uv-field-info">{{  uf.placeholder |trans }}</span>
+                </div>
+                {% endif %} 
+
+                {% if formbuilder.type == '1' and uf.fieldId is defined and uf.fieldId == '104' %}
+                <!-- Field -->
+			    <div class="uv-element-block">
+				    <label class="uv-field-label">{{ uf.name |trans }}</label>
+				    <div class="uv-field-block">
+					    <select name="type" class="uv-select create-ticket" id="type">
+						    <option value="">{{ 'Select type'|trans }}</option>
+
+							    {% for type in ticket_service.getTypes() %}
+								    <option value="{{ type.id }}" {{ post.type is defined and post.type == type.id ? 'selected' : '' }}>{{ type.name }}</option>
+							    {% endfor %}
+					    </select>
+				    </div>
+					    <span class="uv-field-info">{{  uf.placeholder |trans }}</span>
+			    </div>
+			    <!-- //Field -->
+                {% endif %}
+
+                {% if formbuilder.reply == '1' and uf.fieldId is defined and uf.fieldId == '105' %}
+                <div class="uv-element-block">
+                    <label class="uv-field-label">{{ uf.name |trans }}</label>
+                        <div class="uv-field-block">
+                            <textarea name="reply" class="uv-field create-ticket" type="text" id='ticket-message'></textarea required>
+                            <span class="validation-message"></span>
+                        </div>
+                    <span class="uv-field-info">{{  uf.placeholder |trans }}</span>
+                </div>
+                {% endif %}
+
+                {% if formbuilder.order_no == '1' and uf.fieldId is defined and uf.fieldId == '106' %}
+                <div class="uv-element-block">
+                    <label class="uv-field-label">{{ uf.name |trans }} #</label>
+                        <div class="uv-field-block">
+                            <input name="order_no" class="uv-field create-ticket" type="text" value="" required>
+                            <span class="validation-message"></span>
+                        </div>
+                    <span class="uv-field-info">{{  uf.placeholder |trans }}</span>
+                </div>
+                {% endif %}
+             
+                {% if formbuilder.file == '1' and uf.fieldId is defined and uf.fieldId == '107' %}
+                <div class="uv-element-block attachment-block uv-no-error-success-icon">
+                    <label>
+                        <input type="file" name="file">
+                    </label>
+                </div>
+                {% endif %}
+
+             {# {% if formbuilder.gdpr == '1' and uf.fieldId is defined and uf.fieldId == '108' %}
+                <div class="uv-element-block form-builder-checkbox">
+                    <div class="uv-field-block uv-vertical-align" name="gdpr_compliance">
+                        <input type="checkbox" id="gdpr" style="margin-left: unset;width: 20px;height: 25px;">
+                        <span style="position: relative;top: -8px">I agree to the <a href="https://www.uvdesk.com/en/gdpr" target="_blank">  Terms &amp; Conditions</a></span>
+                    </div>
+                </div>
+                {% endif %} #}
+
+            {% endfor %}
+            
+            {% if customFields is not empty and customFields is defined %}
+                {% for cf in customFields %}
+                {% if cf is not empty  %}
+                   {% if (cf.agentType == 'apps') or (cf.agentType == 'both')  %}
+                    {% if cf.fieldType is defined and cf.fieldType == 'text' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                           <label class="uv-field-label">{{ cf.name }}</label>
+                           <div class="uv-field-block">
+                                <input name="customFields[{{  cf.id }}]" class="uv-field create-ticket" type="text" value="" id="{{ cf.id }}" {{ cf.required ? "required" : "" }}>
+                                <span class="validation-message"></span>
+                            </div>
+                            <span class="uv-field-info">{{  cf.value |trans }}</span>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'textarea' %}
+                        <div class="uv-element-block custom-fields textarea {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                             <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                                <input name="customFields[{{  cf.id }}]" class="uv-field create-ticket" type="textarea" value="" id="{{ cf.id }}" {{ cf.required ? "required" : "" }}>
+                                <span class="validation-message"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'radio' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                            <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                                {% for options in cf.options %}
+                                <div class="uv-split-field">
+                                    <input type="radio"  name="customFields[{{  cf.id }}]" value="{{ options.id }}" {{ cf.required ? "required" : "" }}>
+                                    <label for="{{options.id}}">{{ options.name }}</label>
+                                </div>
+                                {% endfor %}
+                                <span class="validation-message"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'select' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                            <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                               <select name="customFields[{{  cf.id }}]" class="uv-field create-ticket" value="{{ cf.id }}" id="for{{cf.name~cf.id}}" {{ cf.required ? "required" : "" }}>
+                                    <option value="">{{ 'Select option' }}</option>
+                                    {% for options in cf.options %}
+                                        <option value="{{options.id}}">{{ options.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="validation-message"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'checkbox' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                             <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                                {% for options in cf.options %}
+                                <div class="uv-split-field">
+                                    <input type="checkbox" class="input-checkbox checkboxes"  name="customFields[{{  cf.id }}]" value="{{ options.id }}" id="{{ cf.id }}" {{ cf.required ? "required" : "" }}>
+                                    <label for="{{ options.id }}"> {{ options.name }} </label>
+                                </div>
+                                {% endfor %}
+                                <span class="validation-message"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'date' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                             <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                                <input name="customFields[{{  cf.id }}]" class="uv-field create-ticket" type="date" value="" id="{{ cf.id }}" {{ cf.required ? "required" : "" }}>
+                                <span class="validation-message"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'time' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                             <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                                <input name="customFields[{{  cf.id }}]" class="uv-field create-ticket" type="time" value="" id="{{ cf.id }}" {{ cf.required ? "required" : "" }}>
+                                <span class="validation-message"></span>
+                             </div>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'datetime' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                             <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                                <input name="customFields[{{  cf.id }}]" class="uv-field create-ticket" type="datetime-local" value="" id="{{ cf.id }}" {{ cf.required ? "required" : "" }}>
+                                <span class="validation-message"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {%  if cf.fieldType is defined and cf.fieldType == 'file' %}
+                        <div class="uv-element-block custom-fields {{ cf.customFieldsDependency|length ? 'dependent' : '' }} {% for customFieldCustomFieldsDependency in cf.customFieldsDependency %} dependency{{customFieldCustomFieldsDependency.id}}{% endfor %}" style="position: relative; {{ cf.customFieldsDependency|length ? 'display: none;' : '' }}">
+                             <label class="uv-field-label">{{ cf.name }}</label>
+                            <div class="uv-field-block">
+                                <input name="customFields[{{  cf.id }}]" class="uv-field create-ticket" type="file" value="" id="{{ cf.id }}" {{ cf.required ? "required" : "" }}>
+                                <span class="validation-message"></span>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+
+            {% endif %}
+
+            <div>
+                <input type="submit"  id="create-ticket-btn" class="uv-btn" value="Create Ticket" />
+            </div> 
+         </form>
+
+    {% else %}
+        <h2> Unable to render FormBuilder Preview. </h2>
+    {% endif %}
+
+    <script type="text/javascript">
+		$(function () {
+			var CreateTicketForm = Backbone.View.extend({
+				events : {
+					'change #type' : "updateCustomFields"
+				},
+				updateCustomFields : function (e) {
+					var dependentFields = e.currentTarget.value;
+					this.$('.dependent').hide();
+					this.$('.dependency' + dependentFields).show();
+				}
+			});
+			var createticketForm = new CreateTicketForm({
+				el : $("#ticket-form"),
+			});
+            $('.name-input').on('input', function() {
+                var c = this.selectionStart,
+                r = /[^a-z0-9 ]/gi,
+                    v = $(this).val();
+                    if(r.test(v)) {
+                        $(this).val(v.replace(r, ''));
+                        c--;
+                    }
+                this.setSelectionRange(c, c);
+            });
+      
+            var checkboxes = $('.input-checkbox');
+            checkboxes.change(function(){
+                if($('.checkboxes:checked').length>0) {
+                    checkboxes.removeAttr('required');
+                } else {
+                    checkboxes.attr('required', 'required');
+                }
+            });
+                
+		});
+	</script>
+    
+{% endblock %}

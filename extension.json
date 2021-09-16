@@ -1,0 +1,17 @@
+{
+    "name": "uvdesk/form-component",
+    "description": "Configue form-builder with uvdesk community helpdesk system.",
+    "type": "uvdesk-module",
+    "authors": [
+        {
+            "name": "uvdesk",
+            "email": "support@uvdesk.com"
+        }
+    ],
+    "autoload": {
+        "UVDesk\\CommunityPackages\\UVDesk\\FormComponent\\": "src/"
+    },
+    "package": {
+        "UVDesk\\CommunityPackages\\UVDesk\\FormComponent\\FormComponentPackage": ["all"]
+    }
+}
